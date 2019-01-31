@@ -277,9 +277,11 @@ gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/Gaze
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Frustum.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Helpers.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/IndexException.hh
+gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Inertial.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Kmeans.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Line2.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Line3.hh
+gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/MassMatrix3.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Matrix3.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Matrix4.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspFix.cpp.o: /usr/include/ignition/math2/ignition/math/Plane.hh
@@ -582,9 +584,11 @@ gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/Gaze
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Frustum.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Helpers.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/IndexException.hh
+gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Inertial.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Kmeans.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Line2.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Line3.hh
+gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/MassMatrix3.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Matrix3.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Matrix4.hh
 gazebo/CMakeFiles/gazeboGraspPlugin.dir/gazebo-pkgs/gazebo_grasp_plugin/src/GazeboGraspGripper.cpp.o: /usr/include/ignition/math2/ignition/math/Plane.hh

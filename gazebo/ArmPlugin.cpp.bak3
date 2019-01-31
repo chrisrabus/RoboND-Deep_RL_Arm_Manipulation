@@ -82,7 +82,7 @@
 #define LOCKBASE true
 
 // Set Task, if true, then only Gripper is allowed to touch tube, else whole arm
-#define GRIPPER_TASK false
+#define GRIPPER_TASK true
 
 namespace gazebo
 {
@@ -114,8 +114,8 @@ ArmPlugin::ArmPlugin() : ModelPlugin(), cameraNode(new gazebo::transport::Node()
 	inputBufferSize  = 0;
 	inputRawWidth    = 0;
 	inputRawHeight   = 0;
-	actionJointDelta = 0.10f;  //0.15f std - reduced, so that arm doesn't move to fast, 0.10f for 1.task
-	actionVelDelta   = 0.1f; //0.1f std
+	actionJointDelta = 0.15f;  //0.15f std - reduced, so that arm doesn't move to fast, 0.10f for 1.task
+	actionVelDelta   = 0.05f; //0.1f
 	maxEpisodeLength = 100;
 	episodeFrames    = 0;
 
@@ -277,15 +277,13 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
 		
 		bool collisionCheck = false;
 
-// next, used for Task 2: Have only the gripper base of the robot arm touch the object, with at least a 80% accuracy
-
 #if GRIPPER_TASK
 		if((strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0) && strcmp(contacts->contact(i).collision2().c_str(), COLLISION_POINT) == 0 )
 		{
           	rewardHistory = REWARD_WIN;
 			newReward  = true;
 			endEpisode = true;
-			std::cout << "Collision with " << contacts->contact(i).collision2() << " \n";
+			std::cout << "Collision with Gripper\n";
           	return;
         }
       	else
@@ -293,15 +291,13 @@ void ArmPlugin::onCollisionMsg(ConstContactsPtr &contacts)
           	rewardHistory = REWARD_LOSS;
 			newReward  = true;
 			endEpisode = true;
-			std::cout << "Collision with " << contacts->contact(i).collision2() << " \n";
+			std::cout << "Collision with something different\n";
           	return;          
         }
       
-  
-// next, used for Task 1: Have any part of the robot arm touch the object of interest, with at least a 90% accuracy   
-
+      
 #else
-		if( strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0 )  // collision with any part of the robot arm is allowed
+		if( strcmp(contacts->contact(i).collision1().c_str(), COLLISION_ITEM) == 0 )
 		{
 			rewardHistory = REWARD_WIN;
 			newReward  = true;
@@ -659,62 +655,57 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
 			
 			if( episodeFrames > 1 )
 			{
-				const float distDelta  = lastGoalDistance - distGoal;
-				
+				const float distDelta  = - lastGoalDistance + 1/distGoal;
 				// calculate distances between joints and Objects
-              	//physics::LinkPtr joint1Base = model->GetLink(JOINT1_NAME);
-              	//const math::Box& joint1BBox = joint1Base->GetBoundingBox();
-              	//const float distJoint1Prop = BoxDistance(joint1BBox, propBBox);
+              	physics::LinkPtr joint1Base = model->GetLink(JOINT1_NAME);
+              	const math::Box& joint1BBox = joint1Base->GetBoundingBox();
+              	const float distJoint1Prop = BoxDistance(joint1BBox, propBBox);
               	
-              	//physics::LinkPtr joint2Base = model->GetLink(JOINT2_NAME);
-              	//const math::Box& joint2BBox = joint2Base->GetBoundingBox();
-              	//const float distJoint2Prop = BoxDistance(joint2BBox, propBBox);
+              	physics::LinkPtr joint2Base = model->GetLink(JOINT2_NAME);
+              	const math::Box& joint2BBox = joint2Base->GetBoundingBox();
+              	const float distJoint2Prop = BoxDistance(joint2BBox, propBBox);
               
-              	//const float distJoint1Grip = BoxDistance(joint1BBox, gripBBox);
+              	const float distJoint1Grip = BoxDistance(joint1BBox, gripBBox);
               
-              	//float rewardDist1 = 0.0f;
+              	float rewardDist1 = 0.0f;
               
-                //if ((distJoint1Grip / distJoint1Prop) > 1.10 && (distJoint1Grip / distJoint1Prop) < 1.15 )
-                //{
-                //  rewardDist1 = 100.0f;
-                //}
-
+                if ((distJoint1Grip / distJoint1Prop) > 1.10 && (distJoint1Grip / distJoint1Prop) < 1.15 )
+                {
+                  rewardDist1 = 100.0f;
+                }
                   
-// next, used for Task 2: Have only the gripper base of the robot arm touch the object, with at least a 80% accuracy
 
 #if GRIPPER_TASK
 				//float EnergyLvl = ((MAX_DIST_2 - distGoal) * (MAX_DIST_2 - distGoal)) / (MAX_DIST_2 * MAX_DIST_2) * distDelta;
               	//avgGoalDelta  = avgGoalDelta + EnergyLvl;
 				//rewardHistory = EnergyLvl * REWARD_WIN;
-              	avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA)); //ALPHA
+              	avgGoalDelta  = (avgGoalDelta * 0.3f) + (1.0/distDelta * (1.0f - 0.3f)); //ALPHA
               	//rewardHistory = exp(-GAMMA_FALLOFF * distGoal) * 0.1f; 
               	//rewardHistory = 0 * avgGoalDelta * REWARD_INTERIM + rewardDist1; 
               	rewardHistory = distDelta * REWARD_INTERIM;
               	newReward     = true;
               	//std::cout << "lastGoalDistance " << lastGoalDistance << "\n";
-              	//std::cout << "distGoal " << distGoal << "\n";
+              	std::cout << "distGoal " << distGoal << "\n";
               	//std::cout << "distDelta " << distDelta << "\n";
-              	//std::cout << "avgGoalDelta " << avgGoalDelta << "\n";
-                //std::cout << "rewardDist1 " << rewardDist1 << "\n";
+              	std::cout << "avgGoalDelta " << avgGoalDelta << "\n";
+                std::cout << "rewardDist1 " << rewardDist1 << "\n";
                 //std::cout << "EnergyLvl " << EnergyLvl << "\n";
-              	//std::cout << "rewardHistory " << rewardHistory << "\n";
-              	//std::cout << "Distance betw joint 1 and Object " << distJoint1Prop << "\n";
-                //std::cout << "Distance betw joint 2 and ob " << distJoint2Prop << "\n";
-                //std::cout << "Distance betw joint 1 and Grip " << distJoint1Grip << "\n";
-
-// next, used for Task 1: Have any part of the robot arm touch the object of interest, with at least a 90% accuracy   
+              	std::cout << "rewardHistory " << rewardHistory << "\n";
+              	std::cout << "Distance betw joint 1 and Object " << distJoint1Prop << "\n";
+                std::cout << "Distance betw joint 2 and ob " << distJoint2Prop << "\n";
+                std::cout << "Distance betw joint 1 and Grip " << distJoint1Grip << "\n";
 #else
 				//float EnergyLvl = ((MAX_DIST_1 - distGoal) * (MAX_DIST_1 - distGoal)) / (MAX_DIST_1 * MAX_DIST_1) * ALPHA;
- 				// compute the smoothed moving average of the delta of the distance to the goal             	
-              	avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));	
-				//rewardHistory = avgGoalDelta * REWARD_WIN;             	
+ 				// compute the smoothed moving average of the delta of the distance to the goal
+              	avgGoalDelta  = (avgGoalDelta * ALPHA) + (distDelta * (1.0f - ALPHA));
+				//rewardHistory = avgGoalDelta * REWARD_WIN;
               	rewardHistory = avgGoalDelta * REWARD_INTERIM; 
               	newReward     = true;
 #endif
-
+              			lastGoalDistance = distDelta;
 			}
 
-			lastGoalDistance = distGoal;
+			//lastGoalDistance = distGoal;
 		} 
 	}
 

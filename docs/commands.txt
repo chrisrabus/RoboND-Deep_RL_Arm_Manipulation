@@ -1,0 +1,13 @@
+
+## switch to bin folder + start arm
+
+cd /home/workspace/RoboND-DeepRL-Project/build/x86_64/bin
+./gazebo-arm.sh
+
+
+sudo apt-get install libignition-math2-dev
+
+cd build
+make
+cd x86_64/bin
+./gazebo-arm.sh
