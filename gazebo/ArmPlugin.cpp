@@ -23,7 +23,7 @@
 
 // Define DQN API Settings
 
-#define INPUT_CHANNELS 3
+#define INPUT_CHANNELS 3   // 3-channels of RGB image
 #define ALLOW_RANDOM true
 #define DEBUG_DQN false
 #define GAMMA 0.9f
@@ -37,10 +37,10 @@
 */
 
 #define NUM_ACTIONS DOF*2   //for each active joint, there are 2 actions -> increase/decrease
-#define INPUT_WIDTH   64
-#define INPUT_HEIGHT  64
+#define INPUT_WIDTH   64 	//width of camera image
+#define INPUT_HEIGHT  64 	//height of camera image
 #define OPTIMIZER "RMSprop"
-#define LEARNING_RATE 0.01f //0.01f
+#define LEARNING_RATE 0.1f //0.01f
 #define REPLAY_MEMORY 20000
 #define BATCH_SIZE 512
 #define USE_LSTM true
@@ -55,10 +55,10 @@
 #define MAX_DIST_1 2.43f	//2.43f
 #define MAX_DIST_2 2.63f	//2.52f
 
-#define REWARD_WIN  200.0f //1.0f 
-#define REWARD_LOSS -200.0f //-1.0f
-#define REWARD_INTERIM 10.0f
-#define ALPHA    0.8f //0.3f for task 1
+#define REWARD_WIN  300.0f //1.0f 
+#define REWARD_LOSS -300.0f //-1.0f
+#define REWARD_INTERIM 200.0f
+#define ALPHA    0.9f //0.3f for task 1
 
 // Define Object Names
 #define WORLD_NAME "arm_world"
@@ -673,40 +673,50 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
               
               	float rewardDist1 = 0.0f;
               
-                if ((distJoint1Grip) > 1.04 && (distJoint1Grip) < 1.15)
-                {
+                //if ((distJoint1Grip) > 1.04 && (distJoint1Grip) < 1.15)
+                //{
                 	if ((distJoint1Grip) > 1.15f)
                 	{
-                		rewardDist1 = 1.15f / distJoint1Grip;
+                		rewardDist1 =  1.15f / distJoint1Grip;
                 	}
                 	else
                 	{
                 		rewardDist1 = distJoint1Grip / 1.15f;	
                 	}
-                }
-                else
-                {
-                	rewardDist1 = -1.0f;
-                }
+               //}
+                //else
+                //{
+               // 	rewardDist1 = -0.3f;  //-1.0f
+               // }
 
                 const float distJoint2GroundMin = joint2BBox.min.z;
                 const float distJoint2GroundMax = joint2BBox.max.z;
                 float rewardDist2 = 0.0f;
+                	
+                	if ((distJoint2GroundMin) > 0.42f)
+                	{
+                		rewardDist2 =  0.42f / distJoint2GroundMin;
+                	}
+                	else
+                	{
+                		rewardDist2 =  distJoint2GroundMin / 0.42f - 1.0f;	
+                	}
+                
 
-                if ((distJoint2GroundMin) > 0.39 && (distJoint2GroundMin) < 0.49)
+                //if ((distJoint2GroundMin) > 0.39 && (distJoint2GroundMin) < 0.49)
+                //{
+
+                //	rewardDist2 = 0.3f;   //2.0f
+
+                //}
+                //else
+                //{
+                //	rewardDist2 = -0.2f;  //-0.9f
+                //}
+
+                if (distGoal < 0.20)
                 {
-
-                	rewardDist2 = 2.0f ;
-
-                }
-                else
-                {
-                	rewardDist2 = -0.9f;
-                }
-
-                if (distGoal < 0.35)
-                {
-                	actionJointDelta = 0.05f;
+                	actionJointDelta = 0.15f;
                 }
                 else
                 {
@@ -744,10 +754,14 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
               	if (avgGoalDelta > 0)
               	{
               		rewardHistory = avgGoalDelta*REWARD_INTERIM;
+              		//rewardHistory = REWARD_INTERIM;
+              		std::cout << "rewardHistory avgGoalDelta > 0 " << rewardHistory << "\n";
               	}
               	else
               	{
               		rewardHistory = REWARD_INTERIM*avgGoalDelta;
+              		//ewardHistory = -REWARD_INTERIM;
+              		std::cout << "rewardHistory avgGoalDelta < 0 " << rewardHistory << "\n";
               	}
               	
               	//rewardHistory = avgGoalDelta * REWARD_INTERIM; // * rewardDist1;
@@ -755,10 +769,18 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
               	if (abs(distDelta*100) <= 0)
               	{
               		//std::cout << "true " << abs(distDelta) << "\n";	
-              		rewardHistory = rewardHistory - 1.1f * REWARD_INTERIM;	
+              		rewardHistory = rewardHistory - 0.5f * REWARD_INTERIM;
+              		std::cout << "Keine Bewegung, Faktor der abgezogen wird " << 1.1f * REWARD_INTERIM << "\n";
               	}
 
-              	rewardHistory = rewardHistory + pow(((MAX_DIST_2 - distGoal) / MAX_DIST_2),4) + rewardDist1 + rewardDist2 + rewardDist4; 
+              	else
+              	{
+              	rewardHistory = (MAX_DIST_2 - distGoal) / MAX_DIST_2 * rewardHistory * rewardDist1 * rewardDist2; // + rewardDist4;               		
+              	}
+
+              	std::cout << "rewardHistory vor Rechnung " << rewardHistory << "\n";
+
+              	//rewardHistory = (MAX_DIST_2 - distGoal) / MAX_DIST_2 * rewardHistory * rewardDist1 * rewardDist2; // + rewardDist4; 
 
               	newReward     = true;
               	//std::cout << "lastGoalDistance " << lastGoalDistance << "\n";
@@ -767,10 +789,15 @@ void ArmPlugin::OnUpdate(const common::UpdateInfo& updateInfo)
               	//std::cout << "avgGoalDelta " << avgGoalDelta << "\n";
                 //std::cout << "rewardDist1 " << rewardDist1 << "\n";
                 //std::cout << "EnergyLvl " << EnergyLvl << "\n";
-              	std::cout << "rewardHistory " << rewardHistory << "\n";
-              	std::cout << "rewardDist4 " << rewardDist4 << "\n";
-              	std::cout << "rewardDist1 " << rewardDist1 << "\n";
-              	std::cout << "rewardDist2 " << rewardDist2 << "\n";
+              	
+              	std::cout << "rewardHistory Gesamt " << rewardHistory << "\n";
+              	//std::cout << "rewardDist4 " << rewardDist4 << "\n";
+              	std::cout << "je naeher am Ziel, desto mehr Punkte " << 0.7f*pow(((MAX_DIST_2 - distGoal) / MAX_DIST_2),4) << "\n";
+              	std::cout << "rewardDist1 Abstand Griper zu Joint" << rewardDist1 << "\n";
+              	std::cout << "rewardDist2 Abstand joint 2 zum Boden " << rewardDist2 << "\n";
+              	std::cout << "ref0 " << ref[0] << "\n";
+              	std::cout << "ref1 " << ref[1] << "\n";
+              	std::cout << "ref2 " << ref[2] << "\n";
               	//std::cout << "Distance betw joint 1 and Object " << distJoint1Prop << "\n";
                 //std::cout << "Distance betw joint 2 and ob " << distJoint2Prop << "\n";
                 //std::cout << "Distance betw joint 1 and Grip " << distJoint1Grip << "\n";
